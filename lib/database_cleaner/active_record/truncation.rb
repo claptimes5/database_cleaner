@@ -232,6 +232,12 @@ module DatabaseCleaner::ActiveRecord
 
     def clean
       connection = connection_class.connection
+
+      # If the Transaction methodology leaves a transaction open, this will hang eventually
+      if connection.open_transactions > 0
+        connection.rollback_transaction
+      end
+
       connection.disable_referential_integrity do
         if pre_count? && connection.respond_to?(:pre_count_truncate_tables)
           connection.pre_count_truncate_tables(tables_to_truncate(connection), {:reset_ids => reset_ids?})

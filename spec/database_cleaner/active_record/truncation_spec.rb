@@ -29,6 +29,7 @@ module DatabaseCleaner
       before(:each) do
         connection.stub(:disable_referential_integrity).and_yield
         connection.stub(:database_cleaner_view_cache).and_return([])
+        connection.stub(:open_transactions).and_return 0
         ::ActiveRecord::Base.stub(:connection).and_return(connection)
       end
 

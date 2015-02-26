@@ -76,6 +76,12 @@ module DatabaseCleaner::ActiveRecord
 
     def clean
       connection = connection_class.connection
+
+      # If the Transaction methodology leaves a transaction open, this will hang eventually
+      if connection.open_transactions > 0
+        connection.rollback_transaction
+      end
+
       connection.disable_referential_integrity do
         tables_to_truncate(connection).each do |table_name|
           connection.delete_table table_name
